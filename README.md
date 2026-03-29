@@ -1,5 +1,8 @@
 # AI-Powered Product Catalog Ingestion Pipeline
 
+Companies struggle with inconsistent supplier catalogs, leading to poor search, duplicate listings, and manual cleanup.
+This system automates ingestion, standardization, and enrichment using AI—reducing manual effort and improving catalog quality.
+
 ## Architecture Overview
 
 This system implements an event-driven, serverless pipeline for processing supplier product catalogs using AI enrichment:
