@@ -1,0 +1,358 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Product Catalog Pipeline Demo</title>
+    <script src="https://unpkg.com/react@18/umd/react.development.js"></script>
+    <script src="https://unpkg.com/react-dom@18/umd/react-dom.development.js"></script>
+    <script src="https://unpkg.com/@babel/standalone/babel.min.js"></script>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <style>
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            margin: 0;
+            padding: 0;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        }
+        .sidebar {
+            width: 256px;
+            background: white;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+            height: 100vh;
+            position: fixed;
+            left: 0;
+            top: 0;
+        }
+        .main-content {
+            margin-left: 256px;
+            background: #f3f4f6;
+            min-height: 100vh;
+            padding: 24px;
+        }
+        .nav-item {
+            display: flex;
+            align-items: center;
+            padding: 12px 24px;
+            color: #4b5563;
+            text-decoration: none;
+            border-left: 4px solid transparent;
+            transition: all 0.2s;
+            cursor: pointer;
+        }
+        .nav-item:hover {
+            background: #f9fafb;
+            color: #1f2937;
+        }
+        .nav-item.active {
+            background: #eff6ff;
+            color: #2563eb;
+            border-left-color: #2563eb;
+        }
+        .card {
+            background: white;
+            border-radius: 12px;
+            padding: 24px;
+            box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+            margin-bottom: 24px;
+        }
+        .stat-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 16px;
+            margin-bottom: 24px;
+        }
+        .stat-card {
+            background: white;
+            padding: 20px;
+            border-radius: 12px;
+            box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+        }
+        .stat-value {
+            font-size: 2rem;
+            font-weight: bold;
+            color: #1f2937;
+        }
+        .stat-label {
+            color: #6b7280;
+            font-size: 0.875rem;
+        }
+    </style>
+</head>
+<body>
+    <div id="root"></div>
+
+    <script type="text/babel">
+        const { useState } = React;
+
+        // Dashboard Component
+        const Dashboard = () => (
+            <div>
+                <h1 className="text-3xl font-bold text-gray-900 mb-6">Dashboard</h1>
+                
+                <div className="stat-grid">
+                    <div className="stat-card">
+                        <div className="stat-value">1,247</div>
+                        <div className="stat-label">Total Products</div>
+                    </div>
+                    <div className="stat-card">
+                        <div className="stat-value">98.5%</div>
+                        <div className="stat-label">Data Quality</div>
+                    </div>
+                    <div className="stat-card">
+                        <div className="stat-value">342</div>
+                        <div className="stat-label">Processed Today</div>
+                    </div>
+                    <div className="stat-card">
+                        <div className="stat-value">12</div>
+                        <div className="stat-label">Active Rules</div>
+                    </div>
+                </div>
+
+                <div className="card">
+                    <h2 className="text-xl font-semibold mb-4">Pipeline Status</h2>
+                    <div className="space-y-4">
+                        <div className="flex items-center justify-between">
+                            <span className="text-gray-700">File Ingestion</span>
+                            <span className="text-green-600">● Active</span>
+                        </div>
+                        <div className="flex items-center justify-between">
+                            <span className="text-gray-700">AI Processing</span>
+                            <span className="text-green-600">● Active</span>
+                        </div>
+                        <div className="flex items-center justify-between">
+                            <span className="text-gray-700">Quality Checks</span>
+                            <span className="text-green-600">● Active</span>
+                        </div>
+                    </div>
+                </div>
+
+                <div className="card">
+                    <h2 className="text-xl font-semibold mb-4">Recent Activity</h2>
+                    <div className="space-y-2">
+                        <div className="text-sm text-gray-600">• 12:45 PM - Processed 150 products from supplier_catalog.csv</div>
+                        <div className="text-sm text-gray-600">• 12:30 PM - Generated quality report for 23 records</div>
+                        <div className="text-sm text-gray-600">• 12:15 PM - AI enrichment completed for 89 products</div>
+                        <div className="text-sm text-gray-600">• 12:00 PM - New file uploaded: inventory_update.xlsx</div>
+                    </div>
+                </div>
+            </div>
+        );
+
+        // Pipeline Demo Component
+        const PipelineDemo = () => {
+            const [isRunning, setIsRunning] = useState(false);
+            
+            const steps = [
+                { name: 'File Upload', status: 'completed' },
+                { name: 'Data Ingestion', status: 'completed' },
+                { name: 'AI Processing', status: 'running' },
+                { name: 'Quality Check', status: 'pending' },
+                { name: 'Storage', status: 'pending' }
+            ];
+
+            return (
+                <div>
+                    <h1 className="text-3xl font-bold text-gray-900 mb-6">Pipeline Demo</h1>
+                    
+                    <div className="card">
+                        <h2 className="text-xl font-semibold mb-4">AI Pipeline Steps</h2>
+                        <div className="space-y-4">
+                            {steps.map((step, index) => (
+                                <div key={index} className="flex items-center space-x-4">
+                                    <div className={`w-4 h-4 rounded-full ${
+                                        step.status === 'completed' ? 'bg-green-500' :
+                                        step.status === 'running' ? 'bg-blue-500' :
+                                        'bg-gray-300'
+                                    }`}></div>
+                                    <div className="flex-1">
+                                        <div className="font-medium">{step.name}</div>
+                                        <div className="text-sm text-gray-600">
+                                            {step.status === 'completed' ? 'Completed successfully' :
+                                             step.status === 'running' ? 'Processing...' :
+                                             'Waiting to start'}
+                                        </div>
+                                    </div>
+                                </div>
+                            ))}
+                        </div>
+                        
+                        <div className="mt-6 flex space-x-4">
+                            <button
+                                onClick={() => setIsRunning(!isRunning)}
+                                className="bg-blue-600 text-white px-6 py-2 rounded-lg hover:bg-blue-700"
+                            >
+                                {isRunning ? 'Stop Pipeline' : 'Start Pipeline'}
+                            </button>
+                            <button className="bg-gray-600 text-white px-6 py-2 rounded-lg hover:bg-gray-700">
+                                Reset
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            );
+        };
+
+        // Data Upload Component
+        const DataUpload = () => (
+            <div>
+                <h1 className="text-3xl font-bold text-gray-900 mb-6">Data Upload</h1>
+                
+                <div className="card">
+                    <h2 className="text-xl font-semibold mb-4">Upload Product Catalog</h2>
+                    <div className="border-2 border-dashed border-gray-300 rounded-lg p-12 text-center">
+                        <div className="text-gray-600 mb-4">
+                            <svg className="mx-auto h-12 w-12 text-gray-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M7 16a4 4 0 01-.88-7.903A5 5 0 1115.9 6L16 6a5 5 0 011 9.9M15 13l-3-3m0 0l-3 3m3-3v12" />
+                            </svg>
+                        </div>
+                        <p className="text-lg mb-2">Drop your CSV or Excel files here</p>
+                        <p className="text-sm text-gray-500 mb-4">or click to browse</p>
+                        <button className="bg-blue-600 text-white px-6 py-2 rounded-lg hover:bg-blue-700">
+                            Select Files
+                        </button>
+                    </div>
+                </div>
+            </div>
+        );
+
+        // Monitoring Component
+        const Monitoring = () => (
+            <div>
+                <h1 className="text-3xl font-bold text-gray-900 mb-6">Monitoring</h1>
+                
+                <div className="stat-grid">
+                    <div className="stat-card">
+                        <div className="stat-value">99.9%</div>
+                        <div className="stat-label">System Uptime</div>
+                    </div>
+                    <div className="stat-card">
+                        <div className="stat-value">45ms</div>
+                        <div className="stat-label">Avg Response Time</div>
+                    </div>
+                    <div className="stat-card">
+                        <div className="stat-value">0.2%</div>
+                        <div className="stat-label">Error Rate</div>
+                    </div>
+                    <div className="stat-card">
+                        <div className="stat-value">1,247</div>
+                        <div className="stat-label">Total Requests</div>
+                    </div>
+                </div>
+            </div>
+        );
+
+        // Settings Component
+        const Settings = () => (
+            <div>
+                <h1 className="text-3xl font-bold text-gray-900 mb-6">Settings</h1>
+                
+                <div className="card">
+                    <h2 className="text-xl font-semibold mb-4">Configuration</h2>
+                    <div className="space-y-4">
+                        <div>
+                            <label className="block text-sm font-medium text-gray-700 mb-2">AWS Region</label>
+                            <select className="w-full border border-gray-300 rounded-lg px-3 py-2">
+                                <option>us-east-1</option>
+                                <option>us-west-2</option>
+                                <option>eu-west-1</option>
+                            </select>
+                        </div>
+                        <div>
+                            <label className="block text-sm font-medium text-gray-700 mb-2">Bedrock Model</label>
+                            <select className="w-full border border-gray-300 rounded-lg px-3 py-2">
+                                <option>anthropic.claude-v2</option>
+                                <option>anthropic.claude-instant-v1</option>
+                            </select>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        );
+
+        // Layout Component
+        const Layout = ({ children, currentPage }) => {
+            const navigation = [
+                { name: 'Dashboard', icon: '📊' },
+                { name: 'Pipeline Demo', icon: '🚀' },
+                { name: 'Data Upload', icon: '📤' },
+                { name: 'Monitoring', icon: '📈' },
+                { name: 'Settings', icon: '⚙️' }
+            ];
+
+            return (
+                <div className="flex">
+                    <div className="sidebar">
+                        <div className="p-6">
+                            <h1 className="text-2xl font-bold text-gray-800">Product Catalog</h1>
+                            <p className="text-sm text-gray-600 mt-1">AI Pipeline Demo</p>
+                        </div>
+                        
+                        <nav className="mt-6">
+                            {navigation.map((item) => (
+                                <div
+                                    key={item.name}
+                                    className={`nav-item ${currentPage === item.name ? 'active' : ''}`}
+                                    onClick={() => window.appState.setCurrentPage(item.name)}
+                                >
+                                    <span className="mr-3">{item.icon}</span>
+                                    {item.name}
+                                </div>
+                            ))}
+                        </nav>
+                    </div>
+
+                    <div className="main-content">
+                        <header className="bg-white shadow-sm p-4 mb-6 rounded-lg">
+                            <div className="flex items-center justify-between">
+                                <h2 className="text-xl font-semibold text-gray-900">
+                                    {currentPage}
+                                </h2>
+                                <div className="text-sm text-gray-600">Welcome, User</div>
+                            </div>
+                        </header>
+
+                        <main>
+                            {children}
+                        </main>
+                    </div>
+                </div>
+            );
+        };
+
+        // Main App Component
+        const App = () => {
+            const [currentPage, setCurrentPage] = useState('Dashboard');
+            
+            // Store state globally for navigation
+            window.appState = { setCurrentPage };
+
+            const renderPage = () => {
+                switch(currentPage) {
+                    case 'Dashboard':
+                        return <Dashboard />;
+                    case 'Pipeline Demo':
+                        return <PipelineDemo />;
+                    case 'Data Upload':
+                        return <DataUpload />;
+                    case 'Monitoring':
+                        return <Monitoring />;
+                    case 'Settings':
+                        return <Settings />;
+                    default:
+                        return <Dashboard />;
+                }
+            };
+
+            return (
+                <Layout currentPage={currentPage}>
+                    {renderPage()}
+                </Layout>
+            );
+        };
+
+        // Render the app
+        ReactDOM.render(<App />, document.getElementById('root'));
+    </script>
+</body>
+</html>

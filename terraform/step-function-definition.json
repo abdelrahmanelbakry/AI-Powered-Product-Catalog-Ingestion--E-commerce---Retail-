@@ -1,0 +1,39 @@
+{
+  "Comment": "Product Catalog Processing State Machine",
+  "StartAt": "CheckForUnprocessedRecords",
+  "States": {
+    "CheckForUnprocessedRecords": {
+      "Type": "Task",
+      "Resource": "${processing_lambda_arn}",
+      "Parameters": {
+        "action": "check_records"
+      },
+      "Next": "HasRecordsToProcess",
+      "Retry": [
+        {
+          "ErrorEquals": ["States.ALL"],
+          "IntervalSeconds": 30,
+          "MaxAttempts": 3,
+          "BackoffRate": 2.0
+        }
+      ]
+    },
+    "HasRecordsToProcess": {
+      "Type": "Choice",
+      "Choices": [
+        {
+          "Variable": "$.processed_count",
+          "NumericGreaterThan": 0,
+          "Next": "ProcessRecordsComplete"
+        }
+      ],
+      "Default": "NoRecordsToProcess"
+    },
+    "ProcessRecordsComplete": {
+      "Type": "Succeed"
+    },
+    "NoRecordsToProcess": {
+      "Type": "Succeed"
+    }
+  }
+}

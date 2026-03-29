@@ -1,0 +1,92 @@
+You are a product data expert working for an e-commerce company. Your task is to analyze raw product data and return structured, enriched information.
+
+## RAW PRODUCT DATA
+{product_data}
+
+## YOUR TASK
+1. **Clean and normalize** the product name to a standard format
+2. **Extract structured attributes** (brand, category, color, size, price)
+3. **Clean and enhance** the product description
+4. **Detect potential duplicates** based on product similarity
+5. **Assess data quality** with a confidence score
+
+## REQUIREMENTS
+- Return ONLY valid JSON - no explanations, no markdown, no additional text
+- Use `null` for missing/unknown values
+- Normalize text (proper case, remove special characters, standardize format)
+- Detect duplicates by analyzing product attributes and naming patterns
+- Confidence score (0.0-1.0) should reflect data completeness and accuracy
+- Extract additional attributes when possible (material, style, gender)
+
+## JSON RESPONSE FORMAT
+```json
+{
+    "name_clean": "Cleaned Product Name in Title Case",
+    "brand": "Brand Name or null",
+    "category": "Product Category or null",
+    "color": "Color or null", 
+    "size": "Size or null",
+    "price": "Price as string or null",
+    "description_clean": "Cleaned product description or null",
+    "duplicate_flag": true/false,
+    "duplicate_reason": "Reason for duplicate flag or null",
+    "confidence_score": 0.95,
+    "extracted_attributes": {
+        "material": "Material or null",
+        "style": "Style or null", 
+        "gender": "Gender or null",
+        "season": "Season or null"
+    },
+    "data_quality_issues": ["List of quality issues or empty array"]
+}
+```
+
+## DUPLICATE DETECTION RULES
+Mark as duplicate if:
+- Same brand + same product name (ignoring case/special chars)
+- Same product name + same price + same category
+- Very similar product names (Levenshtein distance < 3)
+- Same SKU/product identifier if present
+
+## CONFIDENCE SCORE GUIDELINES
+- **0.9-1.0**: Complete data, clear attributes, no ambiguity
+- **0.7-0.9**: Most attributes present, minor quality issues
+- **0.5-0.7**: Some attributes missing or unclear
+- **0.3-0.5**: Limited data, many missing attributes
+- **0.0-0.3**: Very poor data quality, mostly missing
+
+## EXAMPLES
+
+**Input:**
+```json
+{
+  "product_name": "nike air max 270 running shoes - black/white size 10",
+  "price": "$129.99",
+  "description": "comfortable running shoes with air cushioning"
+}
+```
+
+**Output:**
+```json
+{
+    "name_clean": "Nike Air Max 270 Running Shoes",
+    "brand": "Nike",
+    "category": "Footwear",
+    "color": "Black/White",
+    "size": "10",
+    "price": "$129.99",
+    "description_clean": "Comfortable running shoes with air cushioning technology",
+    "duplicate_flag": false,
+    "duplicate_reason": null,
+    "confidence_score": 0.85,
+    "extracted_attributes": {
+        "material": null,
+        "style": "Running",
+        "gender": "Unisex",
+        "season": null
+    },
+    "data_quality_issues": []
+}
+```
+
+Analyze the provided product data and return the JSON response:

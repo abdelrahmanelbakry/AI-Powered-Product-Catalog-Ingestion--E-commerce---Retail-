@@ -1,0 +1,64 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Service Test</title>
+</head>
+<body>
+    <h1>Service Status Test</h1>
+    
+    <div id="results"></div>
+    
+    <script>
+        async function testServices() {
+            const results = document.getElementById('results');
+            
+            // Test Backend API
+            try {
+                const response = await fetch('http://localhost:3002/health');
+                const data = await response.json();
+                results.innerHTML += '<h2>✅ Backend API (http://localhost:3002)</h2>';
+                results.innerHTML += '<pre>' + JSON.stringify(data, null, 2) + '</pre>';
+            } catch (error) {
+                results.innerHTML += '<h2>❌ Backend API</h2>';
+                results.innerHTML += '<p>Error: ' + error.message + '</p>';
+            }
+            
+            // Test ChatBot API
+            try {
+                const response = await fetch('http://localhost:3002/api/chat', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                    body: JSON.stringify({
+                        message: 'How many products do we have?',
+                        session_id: 'test'
+                    })
+                });
+                const data = await response.json();
+                results.innerHTML += '<h2>✅ ChatBot API</h2>';
+                results.innerHTML += '<pre>' + JSON.stringify(data, null, 2) + '</pre>';
+            } catch (error) {
+                results.innerHTML += '<h2>❌ ChatBot API</h2>';
+                results.innerHTML += '<p>Error: ' + error.message + '</p>';
+            }
+            
+            // Test Web UI
+            results.innerHTML += '<h2>🌐 Web UI (http://localhost:3000)</h2>';
+            results.innerHTML += '<p><a href="http://localhost:3000" target="_blank">Open Web UI</a></p>';
+            results.innerHTML += '<p><strong>Instructions:</strong></p>';
+            results.innerHTML += '<ol>';
+            results.innerHTML += '<li>Click the link above to open the Web UI</li>';
+            results.innerHTML += '<li>Navigate to "ChatBot" in the sidebar</li>';
+            results.innerHTML += '<li>Try asking: "How many products do we have?"</li>';
+            results.innerHTML += '<li>Try asking: "Check for missing product names"</li>';
+            results.innerHTML += '<li>Try asking: "Price should be between $50 and $500"</li>';
+            results.innerHTML += '</ol>';
+        }
+        
+        testServices();
+    </script>
+</body>
+</html>

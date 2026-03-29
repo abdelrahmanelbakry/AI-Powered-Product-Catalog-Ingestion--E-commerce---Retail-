@@ -1,0 +1,72 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>React App Test</title>
+</head>
+<body>
+    <h1>Testing React App Access</h1>
+    
+    <div id="results"></div>
+    
+    <script>
+        async function testReactApp() {
+            const results = document.getElementById('results');
+            
+            try {
+                // Test if React app is accessible
+                const response = await fetch('http://localhost:3000/');
+                const text = await response.text();
+                
+                results.innerHTML += '<h2>✅ React App (http://localhost:3000)</h2>';
+                results.innerHTML += '<p>Status: ' + response.status + '</p>';
+                results.innerHTML += '<p>Content Length: ' + text.length + ' characters</p>';
+                
+                if (text.includes('Product Catalog') || text.includes('react')) {
+                    results.innerHTML += '<p>✅ React content detected</p>';
+                } else {
+                    results.innerHTML += '<p>⚠️ React content not found in first 1000 chars</p>';
+                    results.innerHTML += '<p>First 500 chars: ' + text.substring(0, 500) + '</p>';
+                }
+                
+                // Test individual routes
+                const routes = ['/', '/demo', '/upload', '/monitoring', '/settings'];
+                for (const route of routes) {
+                    try {
+                        const routeResponse = await fetch('http://localhost:3000' + route);
+                        results.innerHTML += `<p>Route ${route}: ${routeResponse.status}</p>`;
+                    } catch (error) {
+                        results.innerHTML += `<p>Route ${route}: Error - ${error.message}</p>`;
+                    }
+                }
+                
+            } catch (error) {
+                results.innerHTML += '<h2>❌ React App</h2>';
+                results.innerHTML += '<p>Error: ' + error.message + '</p>';
+            }
+            
+            // Test Backend API
+            try {
+                const apiResponse = await fetch('http://localhost:3002/health');
+                const apiData = await apiResponse.json();
+                results.innerHTML += '<h2>✅ Backend API (http://localhost:3002)</h2>';
+                results.innerHTML += '<pre>' + JSON.stringify(apiData, null, 2) + '</pre>';
+            } catch (error) {
+                results.innerHTML += '<h2>❌ Backend API</h2>';
+                results.innerHTML += '<p>Error: ' + error.message + '</p>';
+            }
+            
+            results.innerHTML += '<h2>🎯 What to Try Next</h2>';
+            results.innerHTML += '<ol>';
+            results.innerHTML += '<li><strong>Open React App:</strong> <a href="http://localhost:3000" target="_blank">http://localhost:3000</a></li>';
+            results.innerHTML += '<li><strong>Look for floating chat button:</strong> Blue button in bottom-right corner</li>';
+            results.innerHTML += '<li><strong>Try the ChatBot:</strong> Click the floating button and ask "How many products?"</li>';
+            results.innerHTML += '<li><strong>Alternative:</strong> If React app doesn\'t work, use <a href="http://localhost:8080/simple-chatbot.html" target="_blank">simple version</a></li>';
+            results.innerHTML += '</ol>';
+        }
+        
+        testReactApp();
+    </script>
+</body>
+</html>
