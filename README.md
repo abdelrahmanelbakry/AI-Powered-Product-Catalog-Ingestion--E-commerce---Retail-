@@ -7,6 +7,27 @@ This system automates ingestion, standardization, and enrichment using AI—redu
 
 This system implements an event-driven, serverless pipeline for processing supplier product catalogs using AI enrichment:
 
+## Demo Flow
+
+1. Upload CSV
+2. System ingests into database
+3. AI enriches product data
+4. Clean dataset available for querying
+
+Result:
+- standardized products
+- extracted attributes
+- duplicate detection
+
+  ## AI Capabilities
+
+- Attribute extraction (color, size, brand)
+- Product categorization
+- Duplicate detection
+- Description enhancement
+- Confidence scoring
+
+  
 ### Data Flow
 1. **File Upload** → S3 (raw zone)
 2. **S3 Event** → Lambda (ingestion)
